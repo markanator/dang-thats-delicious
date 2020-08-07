@@ -24,4 +24,6 @@ router.post(
 router.get("/stores/:id/edit", catchErrors(storeController.editStore));
 // ^^^ with high order function for ASYNC/AWAIT
 
+router.get("/store/:slug", catchErrors(storeController.getStoreBySlug));
+
 module.exports = router;
