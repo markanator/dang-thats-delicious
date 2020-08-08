@@ -94,3 +94,18 @@ exports.getStoreBySlug = async (req, res, next) => {
 
     res.render("store", { store, title: store.name });
 };
+
+exports.getStoresByTag = async (req, res) => {
+    // get from url
+    const tag = req.params.tag;
+    // fix issue where /tag doesnt diplay any stores
+    const tagQuery = tag || { $exists: true };
+    // Custom tag tally function
+    const tagsPromise = Store.getTagsList();
+    // find all stores that have that specific tag
+    const storesPromise = Store.find({ tags: tagQuery });
+    // await all promises => deconstruct into variables right away
+    const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
+    // all gravy
+    res.render("tags", { tags, title: "Tags", tag, stores });
+};
