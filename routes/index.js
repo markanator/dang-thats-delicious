@@ -9,7 +9,9 @@ const { catchErrors } = require("../handlers/errorHandlers");
 // STORES STUFF
 router.get("/", catchErrors(storeController.getStores));
 router.get("/stores", catchErrors(storeController.getStores));
-router.get("/add", storeController.addStore);
+
+router.get("/add", authController.isLoggedin, storeController.addStore);
+
 router.post(
     "/add",
     storeController.upload,
@@ -30,6 +32,7 @@ router.get("/tags/:tag", catchErrors(storeController.getStoresByTag));
 
 // USER STUFF
 router.get("/login", userController.loginForm);
+router.post("/login", authController.login);
 router.get("/register", userController.registerForm);
 router.post(
     "/register",
@@ -37,5 +40,9 @@ router.post(
     userController.register,
     authController.login
 );
+// logout
+router.get("/logout", authController.logout);
+router.get("/account", authController.isLoggedin, userController.account);
+router.post("/account", catchErrors(userController.updateAccount));
 
 module.exports = router;
