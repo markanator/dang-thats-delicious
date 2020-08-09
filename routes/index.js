@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
+// custom controllers
 const storeController = require("../controllers/storeController");
 const userController = require("../controllers/userController");
+const authController = require("../controllers/authController");
 const { catchErrors } = require("../handlers/errorHandlers");
 
 // STORES STUFF
@@ -21,7 +23,7 @@ router.post(
     catchErrors(storeController.updateStore)
 );
 router.get("/stores/:id/edit", catchErrors(storeController.editStore));
-router.get("/store/:slug", catchErrors(storeController.getStoreBySlug));
+router.get("/stores/:slug", catchErrors(storeController.getStoreBySlug));
 // Stores - Tags
 router.get("/tags", catchErrors(storeController.getStoresByTag));
 router.get("/tags/:tag", catchErrors(storeController.getStoresByTag));
@@ -29,6 +31,11 @@ router.get("/tags/:tag", catchErrors(storeController.getStoresByTag));
 // USER STUFF
 router.get("/login", userController.loginForm);
 router.get("/register", userController.registerForm);
-router.post("/register", userController.validateRegister);
+router.post(
+    "/register",
+    userController.validateRegister,
+    userController.register,
+    authController.login
+);
 
 module.exports = router;
