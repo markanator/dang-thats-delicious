@@ -1,13 +1,13 @@
-const mongoose = require("mongoose");
-const Store = mongoose.model("Store");
-const multer = require("multer");
-const jimp = require("jimp");
-const uuid = require("uuid");
+const mongoose = require('mongoose');
+const Store = mongoose.model('Store');
+const multer = require('multer');
+const jimp = require('jimp');
+const uuid = require('uuid');
 
 const multerOptions = {
     storage: multer.memoryStorage(),
     fileFilter(req, file, next) {
-        const isPhoto = file.mimetype.startsWith("image/");
+        const isPhoto = file.mimetype.startsWith('image/');
         if (isPhoto) {
             next(null, true);
         } else {
@@ -17,14 +17,14 @@ const multerOptions = {
 };
 
 exports.homePage = (req, res) => {
-    res.render("index");
+    res.render('index');
 };
 
 exports.addStore = (req, res) => {
-    res.render("editStore", { title: "Add Store" });
+    res.render('editStore', { title: 'Add Store' });
 };
 
-exports.upload = multer(multerOptions).single("photo");
+exports.upload = multer(multerOptions).single('photo');
 
 exports.resize = async (req, res, next) => {
     // check if there is no new file to resize
@@ -32,7 +32,7 @@ exports.resize = async (req, res, next) => {
         next(); // skip to the next middleware
         return;
     }
-    const extension = req.file.mimetype.split("/")[1];
+    const extension = req.file.mimetype.split('/')[1];
     req.body.photo = `${uuid.v4()}.${extension}`;
     // now we resize
     const photo = await jimp.read(req.file.buffer);
@@ -46,7 +46,7 @@ exports.createStore = async (req, res) => {
     req.body.author = req.user._id;
     const store = await new Store(req.body).save();
     req.flash(
-        "success",
+        'success',
         `Successfully Created ${store.name}. Care to leave a review?`
     );
     res.redirect(`/stores/${store.slug}`);
@@ -55,12 +55,12 @@ exports.createStore = async (req, res) => {
 exports.getStores = async (req, res) => {
     // 1. Query the database for a list of all stores
     const stores = await Store.find();
-    res.render("stores", { title: "Stores", stores });
+    res.render('stores', { title: 'Stores', stores });
 };
 
 const confirmOwner = (store, user) => {
     if (!store.author.equals(user._id)) {
-        throw Error("You must own a store in order to edit it!");
+        throw Error('You must own a store in order to edit it!');
     }
 };
 
@@ -70,12 +70,12 @@ exports.editStore = async (req, res) => {
     // 2. confirm they are the owner of the store
     confirmOwner(store, req.user);
     // 3. Render out the edit form so the user can update their store
-    res.render("editStore", { title: `Edit ${store.name}`, store });
+    res.render('editStore', { title: `Edit ${store.name}`, store });
 };
 
 exports.updateStore = async (req, res) => {
     // set the location data to be a point
-    req.body.location.type = "Point";
+    req.body.location.type = 'Point';
     // find and update the store
     const store = await Store.findOneAndUpdate(
         { _id: req.params.id },
@@ -86,7 +86,7 @@ exports.updateStore = async (req, res) => {
         }
     ).exec();
     req.flash(
-        "success",
+        'success',
         `Successfully updated <strong>${store.name}</strong>. <a href="/stores/${store.slug}">View Store →</a>`
     );
     res.redirect(`/stores/${store._id}/edit`);
@@ -95,13 +95,13 @@ exports.updateStore = async (req, res) => {
 
 exports.getStoreBySlug = async (req, res, next) => {
     const store = await await (await Store.findOne({ slug: req.params.slug }))
-        .populate("author")
+        .populate('author')
         .execPopulate();
 
     // skip this func if store was not found
     if (!store) return next();
 
-    res.render("store", { store, title: store.name });
+    res.render('store', { store, title: store.name });
 };
 
 exports.getStoresByTag = async (req, res) => {
@@ -116,5 +116,23 @@ exports.getStoresByTag = async (req, res) => {
     // await all promises => deconstruct into variables right away
     const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
     // all gravy
-    res.render("tags", { tags, title: "Tags", tag, stores });
+    res.render('tags', { tags, title: 'Tags', tag, stores });
+};
+
+exports.searchStores = async (req, res) => {
+    const stores = await Store.find(
+        {
+            $text: {
+                $search: req.query.q,
+            },
+        },
+        {
+            score: { $meta: 'textScore' },
+        }
+    )
+        .sort({
+            score: { $meta: 'textScore' },
+        })
+        .limit(5);
+    res.json(stores);
 };
