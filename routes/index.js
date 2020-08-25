@@ -54,6 +54,8 @@ router.post(
     catchErrors(authController.update)
 );
 router.get('/hearts', catchErrors(storeController.getHearts));
+// TOP Stores
+router.get('/top', catchErrors(storeController.getTopStores));
 
 // REVIEWS
 router.post(
