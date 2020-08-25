@@ -3,47 +3,53 @@ const { glob } = require('glob');
 mongoose.Promise = global.Promise;
 const slug = require('slugs');
 
-const storeSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        trim: true,
-        required: 'Please enter a store name!',
-    },
-    slug: String,
-    description: {
-        type: String,
-        trim: true,
-    },
-    tags: [String],
-    created: {
-        type: Date,
-        default: Date.now,
-    },
-    location: {
-        type: {
+const storeSchema = new mongoose.Schema(
+    {
+        name: {
             type: String,
-            default: 'Point',
+            trim: true,
+            required: 'Please enter a store name!',
         },
-        coordinates: [
-            {
+        slug: String,
+        description: {
+            type: String,
+            trim: true,
+        },
+        tags: [String],
+        created: {
+            type: Date,
+            default: Date.now,
+        },
+        location: {
+            type: {
+                type: String,
+                default: 'Point',
+            },
+            coordinates: [
+                {
                 type: Number,
                 require: "You must supply coordinates!"
                 // prettier-ignore
             },
-            // prettier-ignore
-        ],
-        address: {
-            type: String,
-            require: 'you must supply an address!',
+                // prettier-ignore
+            ],
+            address: {
+                type: String,
+                require: 'you must supply an address!',
+            },
+        },
+        photo: String,
+        author: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'User',
+            required: 'You must supply an author',
         },
     },
-    photo: String,
-    author: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User',
-        required: 'You must supply an author',
-    },
-});
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
+    }
+);
 
 storeSchema.index({
     name: 'text',
@@ -82,5 +88,11 @@ storeSchema.statics.getTagsList = function () {
         { $sort: { count: -1 } },
     ]);
 };
+
+storeSchema.virtual('reviews', {
+    ref: 'Review', // what model to link
+    localField: '_id', // which field on THIS table
+    foreignField: 'store', // which field on OTHER table
+});
 
 module.exports = mongoose.model('Store', storeSchema);
