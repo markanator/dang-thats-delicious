@@ -1041,13 +1041,15 @@ var _bling = __webpack_require__(1);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var mapOptions = {
-    center: { lat: 42.0, lng: -87.7 },
-    zoom: 10
+    center: { lat: 41.998, lng: -87.657 },
+    zoom: 10,
+    disableDefaultUI: true,
+    zoomControl: true
 };
 
 function loadPlaces(map) {
-    var lat = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 42.0;
-    var lng = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -87.7;
+    var lat = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 41.998;
+    var lng = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -87.657;
 
     _axios2.default.get('/api/stores/near?lat=' + lat + '&lng=' + lng).then(function (res) {
         var places = res.data;
@@ -1075,7 +1077,7 @@ function loadPlaces(map) {
         markers.forEach(function (marker) {
             return marker.addListener('click', function () {
                 console.log(this.place);
-                var html = '\n                    <div class="popup">\n                        <a href="/store/' + this.place.slug + '">\n                        <img src="/uploads/' + (this.place.photo || 'store.png') + '" alt="' + this.place.name + '" />\n                        <p>' + this.place.name + ' - ' + this.place.location.address + '</p>\n                        </a>\n                    </div>\n                ';
+                var html = '\n                    <div class="popup">\n                        <a href="/stores/' + this.place.slug + '">\n                        <img src="/uploads/' + (this.place.photo || 'store.png') + '" alt="' + this.place.name + '" />\n                        <p>' + this.place.name + ' - ' + this.place.location.address + '</p>\n                        </a>\n                    </div>\n                ';
                 infoWindow.setContent(html);
                 infoWindow.open(map, this);
             });

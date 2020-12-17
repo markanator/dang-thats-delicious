@@ -4,6 +4,8 @@ import { $ } from './bling';
 const mapOptions = {
     center: { lat: 41.998, lng: -87.657 },
     zoom: 10,
+    disableDefaultUI: true,
+    zoomControl: true,
 };
 
 function loadPlaces(map, lat = 41.998, lng = -87.657) {
@@ -32,13 +34,13 @@ function loadPlaces(map, lat = 41.998, lng = -87.657) {
                 console.log(this.place);
                 const html = `
                     <div class="popup">
-                        <a href="/store/${this.place.slug}">
+                        <a href="/stores/${this.place.slug}">
                         <img src="/uploads/${
                             this.place.photo || 'store.png'
                         }" alt="${this.place.name}" />
                         <p>${this.place.name} - ${
-                    this.place.location.address
-                }</p>
+                        this.place.location.address
+                        }</p>
                         </a>
                     </div>
                 `;
