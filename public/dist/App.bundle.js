@@ -1041,13 +1041,13 @@ var _bling = __webpack_require__(1);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var mapOptions = {
-    center: { lat: 43.2, lng: -79.8 },
+    center: { lat: 42.0, lng: -87.7 },
     zoom: 10
 };
 
 function loadPlaces(map) {
-    var lat = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 43.2;
-    var lng = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -79.8;
+    var lat = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 42.0;
+    var lng = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -87.7;
 
     _axios2.default.get('/api/stores/near?lat=' + lat + '&lng=' + lng).then(function (res) {
         var places = res.data;
