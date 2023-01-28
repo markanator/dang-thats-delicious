@@ -7,3 +7,4 @@ data/
 .env
 variables.env
 variables.env.now
+.yarn
