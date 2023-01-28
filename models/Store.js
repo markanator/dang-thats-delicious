@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { glob } = require('glob');
 mongoose.Promise = global.Promise;
 const slug = require('slugs');
 

@@ -1,21 +1,24 @@
 const express = require('express');
 const session = require('express-session');
-const mongoose = require('mongoose');
-const MongoStore = require('connect-mongo');
+const RedisStore = require("connect-redis")(session)
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const passport = require('passport');
-const promisify = require('es6-promisify');
+const {promisify} = require('es6-promisify');
 const flash = require('connect-flash');
-const expressValidator = require('express-validator');
 const routes = require('./routes/index');
 const helpers = require('./helpers');
 const errorHandlers = require('./handlers/errorHandlers');
+const { createClient } = require("redis")
+
 require('./handlers/passpost');
 
 // create our Express app
 const app = express();
+const redisClient = createClient({ legacyMode: true, url: process.env.REDIS_URL })
+redisClient.connect().catch(console.error)
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -42,7 +45,7 @@ app.use(
         key: process.env.KEY,
         resave: false,
         saveUninitialized: false,
-        store: MongoStore.create({ client: mongoose.connection }),
+        store: new RedisStore({ client: redisClient }),
     })
 );
 
