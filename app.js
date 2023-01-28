@@ -1,7 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
-const MongoStore = require('connect-mongo')(session);
+const MongoStore = require('connect-mongo');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
@@ -29,7 +29,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Exposes a bunch of methods for validating data. Used heavily on userController.validateRegister
-app.use(expressValidator());
+//app.use(expressValidator());
 
 // populates req.cookies with any cookies that came along with the request
 app.use(cookieParser());
@@ -42,13 +42,13 @@ app.use(
         key: process.env.KEY,
         resave: false,
         saveUninitialized: false,
-        store: new MongoStore({ mongooseConnection: mongoose.connection }),
+        store: MongoStore.create({ client: mongoose.connection }),
     })
 );
 
 // Passport JS is what we use to handle our logins
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize({}));
+app.use(passport.session({}));
 
 // The flash middleware let's us use req.flash('error', 'Shit!'), which will then pass that message to the next page the user requests
 app.use(flash());
